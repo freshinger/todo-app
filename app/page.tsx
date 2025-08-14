@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useEffect } from "react";
 import MainContainer from "@/components/Navigation/MainContainer";
 import { Spinner, Box, Heading } from "@chakra-ui/react";
