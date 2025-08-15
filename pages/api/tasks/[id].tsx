@@ -1,19 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-
 import dbConnect from '@/db/connect';
 import { Tasks } from '@/db/models/tasks';
-import { useRouter } from 'next/router';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   const id = request.query.id;
-  console.log(id);
+  
   if (!id) {
     return;
   }
   const db = await dbConnect();
 
   if (request.method === "DELETE") {
-    const task = await Tasks.findByPk(id);
+    const task = await Tasks.findByPk(id.toString());
     task?.destroy();
     response.status(200).json({ message: "Success!" });
   }
@@ -46,7 +44,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
     task.completed = !task.completed; 
     
     await task.save();
-    console.log(task);
+    
     response.status(200).json(task);
   }
 }
