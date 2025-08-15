@@ -70,7 +70,7 @@ const TaskList: FC<TaskListProps> = ({ tasks }) => {
             return [];
           }
           return data.map((task: Task) => {
-            if (task._id === taskId) {
+            if (task.id === taskId) {
               return { ...task, title: nextValue };
             }
             return task;
@@ -121,20 +121,20 @@ const TaskList: FC<TaskListProps> = ({ tasks }) => {
   return (
     <UnorderedList styleType="none" spacing={2} marginTop={5}>
       {filteredTasks.map((task) => (
-        <ListItem key={task._id}>
+        <ListItem key={task.id}>
           <Flex alignItems="center">
             <HStack spacing="12px">
               <Checkbox
                 colorScheme="teal"
-                key={task._id}
+                key={task.id}
                 isChecked={task.completed}
-                onChange={() => handleCompletedTask(task._id)}
+                onChange={() => handleCompletedTask(task.id)}
               ></Checkbox>
 
               <Editable
                 
                 defaultValue={task.title}
-                onSubmit={(nextValue) => handleEditTask(task._id, nextValue)}
+                onSubmit={(nextValue) => handleEditTask(task.id, nextValue)}
               >
                 {task.completed ? (
                   <EditablePreview as="del" />
@@ -155,7 +155,7 @@ const TaskList: FC<TaskListProps> = ({ tasks }) => {
               color="red.300"
               margin="10px"
               icon={<DeleteIcon />}
-              onClick={() => handleDeleteTask(task._id)}
+              onClick={() => handleDeleteTask(task.id)}
             />
           </Flex>
           <Divider />

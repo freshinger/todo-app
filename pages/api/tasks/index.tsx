@@ -1,20 +1,21 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import dbConnect from '@/db/connect';
-import Task from '@/db/models/Task';
+import {Tasks} from '@/db/models/tasks';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
-  await dbConnect();
+  const db = await dbConnect();
 
   if (request.method === "GET") {
-    const tasks = await Task.find().sort("-created_at");
+    const tasks = await Tasks.findAll();
     return response.status(200).json(tasks);
   }
 
   if (request.method === "POST") {
     try {
-      const taskTitle = request.body;
-      const task = new Task(taskTitle);
+      const taskTitle = request.body.title;
+      const task = new Tasks();
+      task.title = taskTitle;
       const record = await task.save();
       return response.status(201).json(record);
     } catch (error) {

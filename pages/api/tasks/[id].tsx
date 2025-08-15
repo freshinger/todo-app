@@ -1,33 +1,34 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import dbConnect from '@/db/connect';
-import Task from '@/db/models/Task';
+import { Tasks } from '@/db/models/tasks';
+import { useRouter } from 'next/router';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
-  const { id } = request.query;
-
+  const id = request.query.id;
+  console.log(id);
   if (!id) {
     return;
   }
-  await dbConnect();
+  const db = await dbConnect();
 
   if (request.method === "DELETE") {
-    await Task.findByIdAndDelete(id);
-
+    const task = await Tasks.findByPk(id);
+    task?.destroy();
     response.status(200).json({ message: "Success!" });
   }
 
   if (request.method === "PUT") {
-    const task = await Task.findById(id);
+    const task = await Tasks.findByPk(id.toString());
 
     if (!task) {
       response.status(404).json({ status: "Task not found" });
       return;
     }
 
-    await Task.findByIdAndUpdate(id, {
-      $set: { title: request.body.title },
-    });
+    task.title = request.body.title;
+
+    await task.save();
 
     response.status(200).json({
       status: `Task ${id} was successfully edited!`,
@@ -35,21 +36,17 @@ export default async function handler(request: NextApiRequest, response: NextApi
   }
 
   if (request.method === "PATCH") {
-    let task = await Task.findById(id);
+    const task = await Tasks.findByPk(id.toString());
 
     if (!task) {
       response.status(404).json({ status: "Task not found" });
       return;
     }
 
-    task = await Task.findByIdAndUpdate(
-      id,
-      {
-        $set: { completed: !task.completed },
-      },
-      { new: true }
-    );
-
+    task.completed = !task.completed; 
+    
+    await task.save();
+    console.log(task);
     response.status(200).json(task);
   }
 }

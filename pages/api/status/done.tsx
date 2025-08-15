@@ -1,13 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-
+import {Tasks} from '../../../db/models/tasks'; 
 import dbConnect from '../../../db/connect';
-import Task from '../../../db/models/Task';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
-  await dbConnect();
+  const db = await dbConnect();
 
   if (request.method === "GET") {
-    const tasks = await Task.find({ completed: true }).sort('-created_at');
+    const tasks = await Tasks.findAll({ where: { completed: true }});
     return response.status(200).json(tasks);
   }
 }

@@ -1,52 +1,11 @@
-import mongoose, { Mongoose } from "mongoose";
+import { Sequelize } from "sequelize";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
-  );
-}
-
-interface ICached {
-  conn: Mongoose | null;
-  promise: Promise<Mongoose> | null;
-}
-
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
- */
-let cached = (global as any).mongoose as ICached;
-
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
-}
-
-async function dbConnect(): Promise<Mongoose> {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI as string, opts).then((mongoose) => {
-      return mongoose;
-    });
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  return cached.conn as Mongoose;
+async function dbConnect(): Promise<Sequelize> {
+  const user = process.env.PG_USER;
+  const password = process.env.PG_PASSWORD;
+  const database = process.env.PG_DATABASE;
+  const host = process.env.PG_HOST;
+  return new Sequelize(`postgres://${user}:${password}@${host}:5432/${database}`)
 }
 
 export default dbConnect;

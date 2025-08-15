@@ -3,7 +3,7 @@ export { }
 declare global {
 
     interface ITask {
-        _id: string;
+        id: string;
         title: string;
         completed: boolean;
     }
